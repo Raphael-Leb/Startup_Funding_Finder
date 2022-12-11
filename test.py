@@ -1,12 +1,8 @@
-# Import the necessary libraries
-import pandas as pd
 import streamlit as st
 
-# Create a sample dataframe
-df = pd.DataFrame({'my_string': ['this, is, a, sample, string']})
-
-# Replace the commas with bullet points
-df['my_string'] = df['my_string'].str.replace(',', '\n •')
-
-# Display the dataframe in a table
-st.dataframe(df)
+# Create a table with a column containing a bulleted list
+st.table(
+    [        ["Item 1", "Item 2", "Item 3"],
+        ["- Item A", "- Item B", "- Item C"],
+    ]
+)

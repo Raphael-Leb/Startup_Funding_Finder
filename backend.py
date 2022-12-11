@@ -17,7 +17,7 @@ def display_info_table(funding_sources):
     #df['Requirements'] = df['Requirements'].str.replace(',', '\n •') # I cannot get this to work please help
 
     #display the dataframe as a table
-    st.table(df)
+    st.table(df.style.format({"Amount": "{:,.0f}"}))
 
 def edit_funding_source(collection, name, new_type, new_city, new_amount, new_requirements, new_contact):
     # Retrieve the funding source document that needs to be updated

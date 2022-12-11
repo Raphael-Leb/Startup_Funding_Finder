@@ -32,11 +32,13 @@ with st.expander("Show funding sources by city"):
 
 display_info_table(funding_sources)
 
-st.write("Export this list to excel:")
-if st.button("Export to excel"):
+#st.write("Export this list to excel:") # I cannot get this to work 
+#if st.button("Export to excel"):
     # Export the data to an excel file
-    df = pd.DataFrame(funding_sources)
-    df.to_csv("funding_sources.csv", index=False)
+    #outfile = open('output.csv', 'wb')
+    #df = pd.DataFrame(dtype=int)
+    #df.to_csv(outfile, index=False)
+    #outfile.close()
     #download the excel file
     #st.markdown(get_table_download_link(df), unsafe_allow_html=True)
 
@@ -47,7 +49,7 @@ with st.expander("Add a new funding source"):
     name = st.text_input("Name")
     type = st.selectbox("Type", ["seed", "venture", "angel", "bursary", "grant", "loan", "equity", "other"])
     city = st.selectbox("City", list(collection.distinct("city")))
-    amount = st.number_input("Amount")
+    amount = st.number_input("Amount", step=1000)
     requirements = st.text_area("requirements")
     contact = st.text_input("Contact")
 
@@ -67,11 +69,11 @@ with st.expander("Add a new funding source"):
 with st.expander("Edit funding source data"):
     # Add input widgets for editing funding source data
     name = st.text_input("Name of funding source to edit")
-    new_type = st.selectbox("Type ", ["seed", "venture", "angel", "bursary", "grant", "loan", "equity", "other"])
-    new_city = st.selectbox("City ", list(collection.distinct("city")))
-    new_amount = st.number_input("Amount ")
-    new_requirements = st.text_area("requirements ")
-    new_contact = st.text_input("Contact ")
+    new_type = st.selectbox("New type ", ["seed", "venture", "angel", "bursary", "grant", "loan", "equity", "other"])
+    new_city = st.selectbox("New city ", list(collection.distinct("city")))
+    new_amount = st.number_input("New amount ")
+    new_requirements = st.text_area("New requirements ")
+    new_contact = st.text_input("New contact ")
 
     # Add a button for submitting the updated data to the database
     if st.button("Edit funding source"):
