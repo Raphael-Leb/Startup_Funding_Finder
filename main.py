@@ -2,9 +2,10 @@ import streamlit as st
 from pymongo import MongoClient
 import pandas as pd
 from backend import *
+from keys import *
 
 # Establish connection to MongoDB database
-client = MongoClient("mongodb://raphael:startup@96.22.162.234:27018/?authMechanism=DEFAULT&authSource=FundingBase")
+client = MongoClient(databaseConnect)
 db = client["FundingBase"]
 collection = db["Sources"]
 
@@ -12,14 +13,14 @@ collection = db["Sources"]
 st.title("Funding Sources for Startups")
 st.text("This app displays information about different funding sources for startups.")
 
-funding_sources = collection.find({},projection={"_id": False,"name": 1, "type": 1, "city": 1, "requirements": 1, "contact": 1})
+funding_sources = collection.find({},projection={"_id": False,"name": 1, "type": 1, "amount":1 , "city": 1, "requirements": 1, "contact": 1})
 
 with st.expander("Show funding sources by type"):
     # Add input widgets to allow the user to control the app
     funding_type = st.selectbox("Select funding type:", ["seed", "venture", "angel", "bursary", "grant", "loan", "equity", "other"])
     if st.button("Show funding sources"):
         # Retrieve data from the database and display it in the app
-        funding_sources = collection.find({"type": funding_type},projection={"_id": False,"name": 1, "type": 1, "city": 1, "requirements": 1, "contact": 1})
+        funding_sources = collection.find({"type": funding_type},projection={"_id": False,"name": 1, "type": 1,"amount":1 , "city": 1, "requirements": 1, "contact": 1})
         
 
 with st.expander("Show funding sources by city"):
@@ -27,9 +28,17 @@ with st.expander("Show funding sources by city"):
     city = st.selectbox("Select city:", list(collection.distinct("city")))
     if st.button("Show funding sources by city"):
         # Retrieve data from the database and display it in the app
-        funding_sources = collection.find({"city": city},projection={"_id": False,"name": 1, "type": 1, "city": 1, "requirements": 1, "contact": 1})
+        funding_sources = collection.find({"city": city},projection={"_id": False,"name": 1, "type": 1, "amount":1 ,"city": 1, "requirements": 1, "contact": 1})
 
-st.table(funding_sources)
+display_info_table(funding_sources)
+
+st.write("Export this list to excel:")
+if st.button("Export to excel"):
+    # Export the data to an excel file
+    df = pd.DataFrame(funding_sources)
+    df.to_csv("funding_sources.csv", index=False)
+    #download the excel file
+    #st.markdown(get_table_download_link(df), unsafe_allow_html=True)
 
 st.title("Contribute to the database")
 with st.expander("Add a new funding source"):
@@ -54,3 +63,17 @@ with st.expander("Add a new funding source"):
             "contact": contact
         })
         st.write("Added funding source with id:", result.inserted_id)
+
+with st.expander("Edit funding source data"):
+    # Add input widgets for editing funding source data
+    name = st.text_input("Name of funding source to edit")
+    new_type = st.selectbox("Type ", ["seed", "venture", "angel", "bursary", "grant", "loan", "equity", "other"])
+    new_city = st.selectbox("City ", list(collection.distinct("city")))
+    new_amount = st.number_input("Amount ")
+    new_requirements = st.text_area("requirements ")
+    new_contact = st.text_input("Contact ")
+
+    # Add a button for submitting the updated data to the database
+    if st.button("Edit funding source"):
+        # Use the edit_funding_source() function to update the data in the database
+        edit_funding_source(collection, name, new_type, new_city, new_amount, new_requirements, new_contact)
